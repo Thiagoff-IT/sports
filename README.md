@@ -53,4 +53,4 @@ Boas práticas
 - Cobertura de testes mínima para funcionalidades críticas.
 
 Licença
-- Adicionar arquivo `LICENSE` (ex.: MIT) conforme necessidade.
+- Adicionar arquivo `LICENSE` (ex.: MIT) conforme necessidade.# final
