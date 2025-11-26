@@ -1,0 +1,38 @@
+# Build directories
+cmake-build-*
+build/
+*.tmp
+*.temp
+
+# IDE files
+.idea/
+.vscode/
+.devcontainer/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+README*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Object files and executables (except CSV data files)
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+
+# CMake cache
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Test files
+Testing/
