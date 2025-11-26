@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <locale>
-#include <windows.h>
 #include <cstdlib>
 #include <string>
 #include "src/Jogador.h"
@@ -37,7 +36,7 @@ string encontrarEquipeDoJogador(string nomeJogador) {
 }
 
 void limparTela() {
-    system("cls");
+    system("clear");
 }
 
 void exibirCabecalho() {
@@ -656,12 +655,8 @@ void exibirCreditos() {
 }
 
 int main() {
-    // Configurar console para Windows
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
-
     // Configurar locale para UTF-8
-    setlocale(LC_ALL, "Portuguese");
+    setlocale(LC_ALL, "pt_BR.UTF-8");
 
     int opcao;
 

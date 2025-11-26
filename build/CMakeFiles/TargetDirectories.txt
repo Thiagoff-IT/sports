@@ -1,0 +1,3 @@
+/workspaces/sports/build/CMakeFiles/rebuild_cache.dir
+/workspaces/sports/build/CMakeFiles/edit_cache.dir
+/workspaces/sports/build/CMakeFiles/sport.dir

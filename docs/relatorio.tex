@@ -1,0 +1,511 @@
+\documentclass[12pt, a4paper]{article}
+
+% Pacotes fundamentais
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{abstract}
+\usepackage{natbib}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+% Configuração das margens (padrão científico)
+\geometry{
+    top=3cm,
+    bottom=2.5cm,
+    left=3cm,
+    right=2.5cm,
+    headheight=1.5cm,
+    footskip=1cm
+}
+
+% Configuração do header e footer
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small Revista de Programação Avançada}
+\rhead{\small 2025}
+\cfoot{\thepage\ de \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.5pt}
+
+% Configuração de links
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor=black,
+}
+
+% Configuração para códigos C++
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=C++
+}
+
+\lstset{style=mystyle}
+
+% Informações do documento
+\title{\Large \textbf{Sistema de Gestão Esportiva em C++: \\
+Uma Abordagem Orientada a Objetos para Gerenciamento de Torneios}}
+\author{%
+    \textbf{Grupo de Desenvolvimento de Programação Avançada}\\
+    Instituto Superior de Tecnologia\\
+    \texttt{desenvolvimento@tech.edu.br}
+}
+\date{\today}
+
+% Configuração de título
+\renewcommand{\themaketitle}{\centering}
+
+\begin{document}
+
+% Apenas o título, sem capa
+\maketitle
+
+% Abstract em inglês
+\begin{abstract}
+\noindent
+This article presents the design and implementation of a sports management system developed in C++17 using object-oriented programming principles. The system enables comprehensive administration of tournaments, teams, players, and rankings through a modular and extensible architecture. We discuss the class structure, design patterns employed, data persistence mechanisms using CSV files, and the system's operational workflow. The proposed solution demonstrates practical application of advanced C++ concepts including encapsulation, composition, and separation of concerns. Results show that the system effectively manages complex sporting events while maintaining data integrity and providing a user-friendly interface.
+
+\noindent
+\textbf{Keywords:} object-oriented programming, C++, sports management, software architecture, design patterns.
+\end{abstract}
+
+\section{Introdução}
+
+A gestão de eventos esportivos é uma tarefa complexa que envolve múltiplas entidades interdependentes: jogadores, equipes, partidas e rankings. Sistemas tradicionais frequentemente enfrentam desafios relacionados à organização, validação de dados e sincronização de informações \cite{sommerville2011}.
+
+Este trabalho apresenta o desenvolvimento de um \textbf{Sistema de Gestão Esportiva} implementado em \textbf{C++17}, focando em princípios de Programação Orientada a Objetos (POO) para criar uma solução modular, extensível e robusta. O sistema foi projetado para:
+
+\begin{enumerate}
+    \item Facilitar o cadastro e gerenciamento de jogadores com atributos heterogêneos.
+    \item Permitir a organização dinâmica de equipes e torneios.
+    \item Automatizar a geração de rodadas e simulação de partidas.
+    \item Manter rankings atualizados em tempo real.
+    \item Persistir dados entre execuções através de arquivos estruturados.
+\end{enumerate}
+
+A importância de tal sistema reside na necessidade de organizar dados complexos de forma estruturada, evitando inconsistências e facilitando futuras expansões. Este artigo descreve a arquitetura implementada, os padrões de projeto aplicados e valida a efetividade da abordagem através de exemplos práticos.
+
+\section{Modelagem do Sistema}
+
+\subsection{Arquitetura Geral}
+
+A arquitetura do sistema segue o padrão de camadas, com separação clara entre camada de aplicação, lógica de negócio e persistência. A Figura \ref{fig:arquitetura} ilustra esta estrutura.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{../arquitetura.png}
+    \caption{Arquitetura em camadas do sistema de gestão esportiva}
+    \label{fig:arquitetura}
+\end{figure}
+
+\subsection{Diagrama de Classes}
+
+O sistema é composto por sete classes principais que interagem de forma coesa. A Tabela \ref{tab:classes} apresenta um resumo estrutural.
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabular}{|l|p{4cm}|p{2cm}|}
+    \hline
+    \textbf{Classe} & \textbf{Responsabilidade} & \textbf{Relações} \\
+    \hline
+    \texttt{Jogador} & Dados e estatísticas individuais & - \\
+    \hline
+    \texttt{Equipe} & Agregação de jogadores & 1..N \texttt{Jogador} \\
+    \hline
+    \texttt{Partida} & Registro de confrontos & 2 \texttt{Equipe} \\
+    \hline
+    \texttt{Torneio} & Orquestração de competição & N \texttt{Partida} \\
+    \hline
+    \texttt{Ranking} & Classificação de participantes & N \texttt{Jogador} \\
+    \hline
+    \texttt{Persistencia} & Acesso a dados persistentes & Todas \\
+    \hline
+    \texttt{Enums} & Definições de constantes & Todas \\
+    \hline
+    \end{tabular}
+    \caption{Estrutura de classes do sistema}
+    \label{tab:classes}
+\end{table}
+
+\subsection{Relacionamentos e Dependências}
+
+O sistema implementa os seguintes relacionamentos:
+
+\begin{itemize}
+    \item \textbf{Composição}: Equipe contém múltiplos Jogadores; Torneio contém múltiplas Partidas.
+    \item \textbf{Agregação}: Ranking agrega dados de múltiplos Jogadores.
+    \item \textbf{Dependência}: Torneio depende de Equipe e Partida para orquestração.
+    \item \textbf{Acoplamento Mínimo}: Persistencia abstrai acesso a dados, reduzindo acoplamento.
+\end{itemize}
+
+\section{Descrição Detalhada das Classes}
+
+\subsection{Classe Jogador}
+
+A classe \texttt{Jogador} representa a unidade atômica do sistema. Encapsula dados pessoais e estatísticas de desempenho em uma entidade coerente.
+
+\subsubsection{Especificação de Atributos}
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Atributo} & \textbf{Tipo} & \textbf{Descrição} \\
+    \hline
+    \texttt{nome} & \texttt{string} & Identificador único \\
+    \texttt{idade} & \texttt{int} & Idade em anos \\
+    \texttt{esporte} & \texttt{string} & Modalidade (ex: Futebol) \\
+    \texttt{tipo} & \texttt{TipoJogador} & AMADOR ou PROFISSIONAL \\
+    \texttt{vitorias} & \texttt{int} & Contador de vitórias \\
+    \texttt{derrotas} & \texttt{int} & Contador de derrotas \\
+    \texttt{empates} & \texttt{int} & Contador de empates \\
+    \hline
+    \end{tabular}
+    \caption{Atributos da classe Jogador}
+    \label{tab:jogador_attrs}
+\end{table}
+
+Os métodos principais incluem: \texttt{registrarVitoria()}, \texttt{registrarDerrota()}, \texttt{registrarEmpate()}, e \texttt{getEstatisticas()}.
+
+\subsection{Classe Equipe}
+
+A classe \texttt{Equipe} implementa o padrão Composite, agrupando múltiplos \texttt{Jogador}es sob uma identidade comum.
+
+\subsubsection{Interfce Pública}
+
+\begin{lstlisting}[caption={Interface da classe Equipe}]
+class Equipe {
+private:
+    string nome;
+    vector<Jogador> jogadores;
+public:
+    void adicionarJogador(Jogador j);
+    void removerJogador(string nomeJogador);
+    bool temJogador(string nomeJogador) const;
+    int getTamanho() const;
+};
+\end{lstlisting}
+
+\subsection{Classe Partida}
+
+\texttt{Partida} representa um confronto entre duas entidades competitivas, registrando resultado e metadados.
+
+\subsection{Classe Torneio}
+
+O \texttt{Torneio} é responsável pela orquestração da competição. Suporta duas modalidades:
+
+\begin{enumerate}
+    \item \textbf{Pontos Corridos}: Round-robin com acúmulo de pontos.
+    \item \textbf{Mata-Mata}: Eliminação progressiva em chaves.
+\end{enumerate}
+
+\subsection{Classe Ranking}
+
+Implementa classificação dinâmica com critérios hierárquicos:
+\begin{enumerate}
+    \item Pontuação total (critério primário)
+    \item Número de vitórias (tiebreaker 1)
+    \item Saldo de confrontos (tiebreaker 2)
+\end{enumerate}
+
+\subsection{Classe Persistencia}
+
+A classe \texttt{Persistencia} abstrai operações de I/O, facilitando manipulação de dados em formato CSV. Implementa métodos estáticos para serialização e desserialização.
+
+\subsubsection{Responsabilidades}
+
+\begin{itemize}
+    \item Carregar dados de jogadores no startup
+    \item Salvar rankings em arquivos
+    \item Fornecer interface simples para acesso a dados
+    \item Manter integridade durante operações de I/O
+\end{itemize}
+
+\section{Fluxo de Execução e Operação}
+
+\subsection{Ciclo de Vida da Aplicação}
+
+O sistema opera em quatro fases distintas:
+
+\begin{enumerate}
+    \item \textbf{Inicialização}: Carregamento de dados persistentes via \texttt{Persistencia}.
+    \item \textbf{Apresentação}: Menu interativo oferecendo opções de navegação.
+    \item \textbf{Processamento}: Manipulação de objetos em memória conforme seleção do usuário.
+    \item \textbf{Encerramento}: Salvamento de alterações em arquivos.
+\end{enumerate}
+
+\subsection{Gerenciamento de Persistência}
+
+A estratégia de persistência utiliza arquivos CSV como formato de armazenamento. Este formato oferece vantagens:
+
+\begin{itemize}
+    \item Legibilidade humana para auditoria e debugging
+    \item Compatibilidade com ferramentas externas (planilhas, análise de dados)
+    \item Simplicidade de implementação
+    \item Independência de bibliotecas externas
+\end{itemize}
+
+O sistema mantém sincronização entre estados em memória e disco através de operações de salvamento em pontos críticos (cadastro, término de torneio, encerramento).
+
+\section{Implementação e Exemplos de Código}
+
+\subsection{Exemplo 1: Criação de um Torneio}
+
+O Código \ref{lst:torneio} demonstra a instanciação e operação básica de um torneio:
+
+\begin{lstlisting}[caption={Exemplo de criação de torneio},label={lst:torneio}]
+Torneio torneio("Copa 2025", PONTOS_CORRIDOS);
+
+torneio.adicionarParticipante("Ana Silva");
+torneio.adicionarParticipante("Carlos Santos");
+torneio.adicionarParticipante("Maria Oliveira");
+
+torneio.gerarRodadas();
+torneio.simularPartidas();
+
+ranking.adicionarPontuacao("Ana Silva", 9);
+ranking.adicionarPontuacao("Carlos Santos", 4);
+ranking.gerar();
+ranking.exibir();
+\end{lstlisting}
+
+\subsection{Exemplo 2: Gerenciamento de Equipes}
+
+O Código \ref{lst:equipe} ilustra a formação de equipes:
+
+\begin{lstlisting}[caption={Exemplo de formação de equipe},label={lst:equipe}]
+Equipe equipe("Raios FC");
+
+Jogador j1("Ana Silva", 22, "Futebol", PROFISSIONAL);
+Jogador j2("Carlos Santos", 25, "Futebol", AMADOR);
+
+equipe.adicionarJogador(j1);
+equipe.adicionarJogador(j2);
+
+if(equipe.temJogador("Ana Silva")) {
+    cout << "Ana Silva esta na equipe" << endl;
+}
+
+equipe.removerJogador("Carlos Santos");
+\end{lstlisting}
+
+\subsection{Exemplo 3: Persistência de Dados}
+
+O Código \ref{lst:persist} mostra operações de salvamento e carregamento:
+
+\begin{lstlisting}[caption={Exemplo de persistencia},label={lst:persist}]
+// Salvar jogadores
+vector<Jogador> jogadores;
+Persistencia::salvarJogadores(jogadores, 
+                               "jogadores.csv");
+
+// Carregar dados
+vector<Jogador> carregados = 
+    Persistencia::carregarJogadores(
+        "jogadores.csv");
+
+// Salvar ranking
+ranking.exportar("ranking.csv");
+\end{lstlisting}
+
+\section{Padrões de Projeto e Princípios de Design}
+
+\subsection{Padrões Aplicados}
+
+O sistema incorpora os seguintes padrões de projeto:
+
+\begin{enumerate}
+    \item \textbf{Singleton}: A classe \texttt{Persistencia} implementa métodos estáticos, oferecendo interface única para operações de I/O.
+    
+    \item \textbf{Composite}: \texttt{Equipe} agrega múltiplos \texttt{Jogador}es sob uma estrutura hierárquica.
+    
+    \item \textbf{Strategy}: O padrão de modalidades (\texttt{PONTOS\_CORRIDOS}, \texttt{MATA\_MATA}) permite diferentes estratégias de torneio.
+\end{enumerate}
+
+\subsection{Princípios SOLID}
+
+O design respeita os princípios SOLID:
+
+\begin{itemize}
+    \item \textbf{S - Single Responsibility}: Cada classe tem uma responsabilidade bem definida.
+    \item \textbf{O - Open/Closed}: O sistema é aberto para extensão (novas modalidades) e fechado para modificação.
+    \item \textbf{L - Liskov Substitution}: Classes podem ser substituídas por subclasses sem quebrar o código.
+    \item \textbf{I - Interface Segregation}: Interfaces são específicas e não forçam implementações desnecessárias.
+    \item \textbf{D - Dependency Inversion}: Dependências apontam para abstrações, não para implementações concretas.
+\end{itemize}
+
+\subsection{Encapsulamento e Abstração}
+
+O sistema implementa forte encapsulamento através de:
+
+\begin{itemize}
+    \item Atributos privados com acesso controlado via getters/setters
+    \item Métodos públicos que expõem apenas interface relevante
+    \item Abstração de detalhes de implementação (ex: formato CSV)
+\end{itemize}
+
+\section{Análise Técnica}
+
+\subsection{Complexidade Computacional}
+
+A Tabela \ref{tab:complexidade} apresenta a análise de complexidade das operações críticas:
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Operação} & \textbf{Tempo} & \textbf{Espaço} \\
+    \hline
+    Adicionar Jogador à Equipe & O(1) & O(n) \\
+    Buscar Jogador na Equipe & O(n) & O(1) \\
+    Gerar Rodadas (Pontos Corridos) & O(n²) & O(n²) \\
+    Simular Partida & O(1) & O(1) \\
+    Ordenar Ranking & O(n log n) & O(n) \\
+    Salvar/Carregar Dados & O(n) & O(n) \\
+    \hline
+    \end{tabular}
+    \caption{Análise de complexidade de operações críticas}
+    \label{tab:complexidade}
+\end{table}
+
+onde $n$ representa o número de participantes ou jogadores.
+
+\subsection{Gestão de Memória}
+
+O sistema utiliza:
+
+\begin{itemize}
+    \item \textbf{Stack}: Objetos de curta duração (variáveis locais, estruturas temporárias)
+    \item \textbf{Heap}: Vetores dinâmicos (\texttt{vector<Jogador>}, \texttt{vector<Equipe>})
+    \item \textbf{RAII}: Padrão Resource Acquisition Is Initialization para liberação automática
+\end{itemize}
+
+Os contêineres STL (\texttt{vector}, \texttt{string}) gerenciam automaticamente a memória dinâmica, reduzindo risco de vazamentos.
+
+\section{Resultados e Avaliação}
+
+\subsection{Funcionalidades Implementadas}
+
+O sistema foi validado com sucesso quanto às funcionalidades propostas:
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Funcionalidade} & \textbf{Status} \\
+    \hline
+    Cadastro de Jogadores & ✓ Implementado \\
+    Formação de Equipes & ✓ Implementado \\
+    Criação de Torneios & ✓ Implementado \\
+    Geração de Rodadas & ✓ Implementado \\
+    Simulação de Partidas & ✓ Implementado \\
+    Ranking Dinâmico & ✓ Implementado \\
+    Persistência em CSV & ✓ Implementado \\
+    Interface de Menu & ✓ Implementado \\
+    \hline
+    \end{tabular}
+    \caption{Status das funcionalidades implementadas}
+    \label{tab:funcionalidades}
+\end{table}
+
+\subsection{Vantagens da Abordagem}
+
+\begin{enumerate}
+    \item \textbf{Modularidade}: Facilita manutenção e evolução independente de componentes.
+    \item \textbf{Reutilização}: Código estruturado permite reuso em diferentes contextos esportivos.
+    \item \textbf{Testabilidade}: Separação clara de responsabilidades facilita testes unitários.
+    \item \textbf{Escalabilidade}: Arquitetura preparada para crescimento (mais jogadores, torneios).
+    \item \textbf{Portabilidade}: C++17 com STL garante compatibilidade multiplataforma.
+\end{enumerate}
+
+\subsection{Limitações e Trabalhos Futuros}
+
+Limitações identificadas:
+
+\begin{itemize}
+    \item Sem suporte a banco de dados (atualmente apenas CSV)
+    \item Sem interface gráfica (apenas linha de comando)
+    \item Simulação simplificada de resultados (aleatória)
+    \item Sem validação avançada de dados de entrada
+\end{itemize}
+
+Possíveis extensões futuras:
+
+\begin{enumerate}
+    \item Integração com SQLite/MySQL para persistência relacional
+    \item Desenvolvimento de interface gráfica com Qt ou wxWidgets
+    \item Implementação de sistema de pontuação ELO dinâmico
+    \item Validação robusta de entrada com tratamento de exceções
+    \item API REST para acesso remoto
+    \item Suporte a múltiplas línguas (internacionalização)
+    \item Análise estatística avançada de performance
+\end{enumerate}
+
+\section{Conclusão}
+
+Este artigo apresentou o design, implementação e validação de um Sistema de Gestão Esportiva desenvolvido em C++17 com foco em princípios de Programação Orientada a Objetos. 
+
+O sistema implementa com sucesso as sete classes principais (\texttt{Jogador}, \texttt{Equipe}, \texttt{Partida}, \texttt{Torneio}, \texttt{Ranking}, \texttt{Persistencia}, e enumeradores) que trabalham de forma coesa para gerenciar torneios esportivos em duas modalidades distintas (pontos corridos e mata-mata).
+
+A arquitetura em camadas, aplicação de padrões de projeto reconhecidos e aderência aos princípios SOLID garantem um sistema robusto, manutenível e preparado para futuras expansões. A utilização de CSV para persistência oferece simplicidade e portabilidade, enquanto o encapsulamento adequado previne inconsistências de dados.
+
+Os resultados demonstram que a abordagem orientada a objetos é adequada para este domínio, facilitando tanto o entendimento quanto a evolução do sistema. Recomenda-se a continuação deste trabalho em direção às extensões propostas, particularmente a integração com banco de dados relacional e desenvolvimento de interface gráfica.
+
+\section*{Referências}
+
+\begin{thebibliography}{99}
+
+\bibitem{sommerville2011}
+Sommerville, I. (2011). \textit{Software Engineering} (9th ed.). Addison-Wesley Professional.
+
+\bibitem{gamma1994}
+Gamma, E., Helm, R., Johnson, R., \& Vlissides, J. (1994). \textit{Design Patterns: Elements of Reusable Object-Oriented Software}. Addison-Wesley.
+
+\bibitem{martin2003}
+Martin, R. C. (2003). Agile Software Development: Principles, Patterns, and Practices. Prentice Hall.
+
+\bibitem{cplusplus2020}
+cplusplus.com (2020). \textit{C++ Reference}. Disponível em: \texttt{https://cplusplus.com/reference/}
+
+\bibitem{stroustrup2013}
+Stroustrup, B. (2013). \textit{The C++ Programming Language} (4th ed.). Addison-Wesley Professional.
+
+\end{thebibliography}
+
+\end{document}

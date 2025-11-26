@@ -1,0 +1,37 @@
+[
+{
+  "directory": "/workspaces/sports/build",
+  "command": "/usr/bin/g++ -g -std=gnu++2a -o CMakeFiles/sport.dir/main.cpp.o -c /workspaces/sports/main.cpp",
+  "file": "/workspaces/sports/main.cpp"
+},
+{
+  "directory": "/workspaces/sports/build",
+  "command": "/usr/bin/g++ -g -std=gnu++2a -o CMakeFiles/sport.dir/src/Equipe.cpp.o -c /workspaces/sports/src/Equipe.cpp",
+  "file": "/workspaces/sports/src/Equipe.cpp"
+},
+{
+  "directory": "/workspaces/sports/build",
+  "command": "/usr/bin/g++ -g -std=gnu++2a -o CMakeFiles/sport.dir/src/Jogador.cpp.o -c /workspaces/sports/src/Jogador.cpp",
+  "file": "/workspaces/sports/src/Jogador.cpp"
+},
+{
+  "directory": "/workspaces/sports/build",
+  "command": "/usr/bin/g++ -g -std=gnu++2a -o CMakeFiles/sport.dir/src/Partida.cpp.o -c /workspaces/sports/src/Partida.cpp",
+  "file": "/workspaces/sports/src/Partida.cpp"
+},
+{
+  "directory": "/workspaces/sports/build",
+  "command": "/usr/bin/g++ -g -std=gnu++2a -o CMakeFiles/sport.dir/src/Persistencia.cpp.o -c /workspaces/sports/src/Persistencia.cpp",
+  "file": "/workspaces/sports/src/Persistencia.cpp"
+},
+{
+  "directory": "/workspaces/sports/build",
+  "command": "/usr/bin/g++ -g -std=gnu++2a -o CMakeFiles/sport.dir/src/Ranking.cpp.o -c /workspaces/sports/src/Ranking.cpp",
+  "file": "/workspaces/sports/src/Ranking.cpp"
+},
+{
+  "directory": "/workspaces/sports/build",
+  "command": "/usr/bin/g++ -g -std=gnu++2a -o CMakeFiles/sport.dir/src/Torneio.cpp.o -c /workspaces/sports/src/Torneio.cpp",
+  "file": "/workspaces/sports/src/Torneio.cpp"
+}
+]

@@ -1,0 +1,35 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++ arquivo de build ativo",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-std=c++17",
+                "${workspaceFolder}/main.cpp",
+                "${workspaceFolder}/src/Jogador.cpp",
+                "${workspaceFolder}/src/Equipe.cpp",
+                "${workspaceFolder}/src/Torneio.cpp",
+                "${workspaceFolder}/src/Ranking.cpp",
+                "${workspaceFolder}/src/Persistencia.cpp",
+                "${workspaceFolder}/src/Partida.cpp",
+                "-o",
+                "${workspaceFolder}/main"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Compila todos os arquivos C++ do projeto"
+        }
+    ],
+    "version": "2.0.0"
+}
