@@ -1,0 +1,141 @@
+@startuml Sistema de Gerenciamento Esportivo
+
+!define ABSTRACT abstract
+!define INTERFACE interface
+
+' Enumerações
+enum TipoJogador {
+  AMADOR
+  PROFISSIONAL
+}
+
+enum ModalidadeTorneio {
+  MATA_MATA
+  PONTOS_CORRIDOS
+}
+
+' Estruturas
+struct Resultado {
+  -placar1: int
+  -placar2: int
+}
+
+' Classes principais
+class Jogador {
+  -nome: string
+  -idade: int
+  -esporte: string
+  -tipo: TipoJogador
+  -vitorias: int = 0
+  -derrotas: int = 0
+  -empates: int = 0
+  --
+  +Jogador(nome: string, idade: int, esporte: string, tipo: TipoJogador)
+  +getNome(): string
+  +getIdade(): int
+  +getEsporte(): string
+  +getTipo(): TipoJogador
+  +getVitorias(): int
+  +registrarVitoria(): void
+  +registrarDerrota(): void
+  +registrarEmpate(): void
+  +getEstatisticas(): string
+  +salvar(out: ofstream): void
+  +{static} carregar(linha: string): Jogador
+}
+
+class Equipe {
+  -nome: string
+  -jogadores: vector<Jogador>
+  --
+  +Equipe(nome: string)
+  +adicionarJogador(j: Jogador): void
+  +removerJogador(nomeJogador: string): void
+  +alterarNome(novoNome: string): void
+  +temJogador(nomeJogador: string): bool
+  +getNome(): string
+  +getJogadores(): vector<Jogador>
+  +getTamanho(): int
+  +listarJogadores(): void
+}
+
+class Partida {
+  -participante1: string
+  -participante2: string
+  -resultado: Resultado
+  --
+  +Partida(p1: string, p2: string)
+  +simularResultado(): void
+  +exibir(): void
+}
+
+class Torneio {
+  -nome: string
+  -modalidade: ModalidadeTorneio
+  -participantes: vector<string>
+  -partidas: vector<Partida>
+  --
+  +Torneio(nome: string, modalidade: ModalidadeTorneio)
+  +adicionarParticipante(p: string): void
+  +gerarRodadas(): void
+  +simularPartidas(): void
+}
+
+class Ranking {
+  -classificacao: vector<pair<string, int>>
+  --
+  +adicionarPontuacao(nome: string, pontos: int): void
+  +gerar(): void
+  +exibir(): void
+  +exportar(arquivo: string): void
+}
+
+class Persistencia {
+  --
+  +{static} salvarJogadores(jogadores: vector<Jogador>&, arquivo: string): void
+}
+
+' Relacionamentos
+Equipe "1" *-- "0..*" Jogador : contém
+Torneio "1" o-- "0..*" Partida : organiza
+Partida "1" -- "1" Resultado : possui
+Jogador "0..*" -- "0..*" Torneio : participa
+Ranking "1" -- "0..*" Jogador : classifica
+Persistencia -- Jogador : usa
+
+TipoJogador -up- Jogador
+ModalidadeTorneio -up- Torneio
+
+note right of Jogador
+  Representa um jogador no sistema
+  com histórico de vitórias/derrotas
+  e especialidade em esportes.
+end note
+
+note right of Equipe
+  Agrupamento de jogadores
+  para competições em grupo.
+end note
+
+note right of Partida
+  Representa um confronto entre
+  dois participantes com resultado.
+end note
+
+note right of Torneio
+  Organiza e gerencia competições
+  com diferentes modalidades
+  (pontos corridos ou mata-mata).
+end note
+
+note right of Ranking
+  Mantém a classificação de jogadores
+  baseada em pontuação acumulada.
+end note
+
+note right of Persistencia
+  Classe utilitária para salvar
+  dados em formato CSV.
+end note
+
+@enduml

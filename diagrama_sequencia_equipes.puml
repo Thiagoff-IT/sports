@@ -1,0 +1,87 @@
+@startuml Fluxo de Gerenciamento de Equipes
+
+participant Usuario
+participant Main
+participant Equipe
+participant Jogador
+participant Persistencia
+
+== Gerenciar Equipes ==
+
+Usuario -> Main: Escolhe opção 5 (Gerenciar Equipes)
+activate Main
+
+Main -> Main: Verificar se existem jogadores
+note right of Main
+  Se não houver jogadores,
+  direciona para cadastro
+end note
+
+loop Enquanto opcão ≠ 0
+  
+  alt Opção 1: Criar Nova Equipe
+    Usuario -> Main: Nome da equipe
+    Main -> Equipe: new(nomeEquipe)
+    activate Equipe
+    Equipe --> Main: Equipe criada
+    deactivate Equipe
+  
+  else Opção 2: Listar Equipes
+    Main -> Main: Listar todas equipes
+    loop Para cada equipe
+      Main -> Equipe: listarJogadores()
+      activate Equipe
+      Equipe -> Equipe: Exibir jogadores
+      Equipe --> Main: Informações da equipe
+      deactivate Equipe
+    end
+  
+  else Opção 3: Adicionar Jogador a Equipe
+    Usuario -> Main: Selecionar equipe e jogador
+    Main -> Main: Verificar disponibilidade
+    note right of Main
+      Jogador não pode estar
+      em outra equipe
+    end note
+    
+    Main -> Equipe: adicionarJogador(jogador)
+    activate Equipe
+    Equipe -> Jogador: Registrar associação
+    Equipe --> Main: Jogador adicionado
+    deactivate Equipe
+  
+  else Opção 4: Remover Jogador da Equipe
+    Usuario -> Main: Selecionar equipe e jogador
+    Main -> Equipe: removerJogador(nomeJogador)
+    activate Equipe
+    Equipe -> Jogador: Desvincular
+    Equipe --> Main: Jogador removido
+    deactivate Equipe
+  
+  else Opção 5: Editar Nome da Equipe
+    Usuario -> Main: Novo nome
+    Main -> Equipe: alterarNome(novoNome)
+    activate Equipe
+    Equipe --> Main: Nome alterado
+    deactivate Equipe
+  
+  else Opção 6: Excluir Equipe
+    Usuario -> Main: Confirmar exclusão
+    Main -> Equipe: Remover
+    activate Equipe
+    Equipe --> Main: Equipe excluída
+    deactivate Equipe
+  
+  else Opção 7: Ver Jogadores Livres
+    Main -> Main: Filtrar jogadores não associados
+    loop Para cada jogador livre
+      Main -> Main: Exibir dados do jogador
+    end
+  
+  end
+  
+end
+
+deactivate Main
+
+@enduml

@@ -1,0 +1,140 @@
+@startuml Diagrama de Sequência - Sistema de Gerenciamento Esportivo
+
+participant Usuario
+participant Main
+participant Torneio
+participant Partida
+participant Equipe
+participant Jogador
+participant Ranking
+participant Persistencia
+
+== 1. CADASTRO DE JOGADORES ==
+Usuario -> Main: Opção 2: Criar Jogadores
+activate Main
+Main -> Main: Validar quantidade (2-20)
+loop Para cada jogador
+    Usuario -> Main: Nome, Idade, Esporte, Nível
+    Main -> Jogador: new(nome, idade, esporte, tipo)
+    activate Jogador
+    Jogador --> Main: Jogador criado
+    deactivate Jogador
+end
+Main -> Persistencia: salvarJogadores(jogadores[], "jogadores.csv")
+activate Persistencia
+Persistencia --> Main: Arquivo salvo
+deactivate Persistencia
+deactivate Main
+
+== 2. FORMAÇÃO DE EQUIPES ==
+Usuario -> Main: Opção 5: Gerenciar Equipes
+activate Main
+loop Opções do menu de equipes
+    alt Criar Nova Equipe
+        Usuario -> Main: Nome da equipe
+        Main -> Equipe: new(nomeEquipe)
+        activate Equipe
+        Equipe --> Main: Equipe criada
+        deactivate Equipe
+    else Adicionar Jogador a Equipe
+        Usuario -> Main: Selecionar equipe e jogador
+        Main -> Main: Verificar se jogador está livre
+        Main -> Equipe: adicionarJogador(jogador)
+        activate Equipe
+        Equipe -> Jogador: Associar à equipe
+        Equipe --> Main: Jogador adicionado
+        deactivate Equipe
+    else Listar Equipes
+        Main -> Equipe: getJogadores()
+        activate Equipe
+        Equipe --> Main: Lista de jogadores
+        deactivate Equipe
+    end
+end
+deactivate Main
+
+== 3. ORGANIZAÇÃO DE TORNEIO ==
+Usuario -> Main: Opção 3: Organizar Torneio
+activate Main
+Usuario -> Main: Nome e tipo do torneio
+Main -> Torneio: new(nome, modalidade)
+activate Torneio
+
+loop Para cada jogador
+    Main -> Torneio: adicionarParticipante(nomeJogador)
+end
+
+Main -> Torneio: gerarRodadas()
+note right of Torneio
+    Gera todas as combinações
+    de partidas possíveis
+end note
+
+Main -> Torneio: simularPartidas()
+activate Torneio
+
+loop Para cada combinação de participantes
+    Torneio -> Partida: new(participante1, participante2)
+    activate Partida
+    
+    Partida -> Partida: simularResultado()
+    note right of Partida
+        Gera placar aleatório:
+        placar1 = rand() % 10
+        placar2 = rand() % 10
+    end note
+    
+    Torneio -> Partida: exibir()
+    Partida --> Torneio: Resultado exibido
+    deactivate Partida
+end
+deactivate Torneio
+deactivate Torneio
+
+== 4. GERAÇÃO DE RANKING ==
+Main -> Ranking: new()
+activate Ranking
+
+loop Para cada jogador
+    Main -> Ranking: adicionarPontuacao(nome, pontos)
+end
+
+Main -> Ranking: gerar()
+note right of Ranking
+    Ordena jogadores pela
+    pontuação em ordem
+    decrescente
+end note
+
+Main -> Ranking: exibir()
+activate Ranking
+Ranking --> Main: Ranking exibido na tela
+deactivate Ranking
+
+== 5. EXPORTAÇÃO DE DADOS ==
+Main -> Ranking: exportar("ranking.csv")
+activate Ranking
+Ranking -> Persistencia: salvarDados()
+activate Persistencia
+Persistencia --> Ranking: Arquivo criado
+deactivate Persistencia
+deactivate Ranking
+
+Main -> Persistencia: salvarJogadores(jogadores[], "jogadores.csv")
+activate Persistencia
+Persistencia --> Main: Dados persistidos
+deactivate Persistencia
+
+Main --> Usuario: [SUCCESS] Sistema finalizado
+deactivate Main
+
+note over Usuario, Persistencia
+    Fluxo completo de um ciclo do sistema:
+    1. Usuário cadastra jogadores (salvos em CSV)
+    2. Organiza jogadores em equipes
+    3. Cria e simula um torneio
+    4. Gera ranking final
+    5. Exporta resultados
+end note
+
+@enduml

@@ -1,0 +1,102 @@
+@startuml Fluxo de Organização de Torneio
+
+participant Usuario
+participant Main
+participant Torneio
+participant Partida
+participant Ranking
+participant Persistencia
+
+== Demonstração Completa ==
+
+Usuario -> Main: Executa opção 1
+activate Main
+
+Main -> Main: Limpar tela e criar jogadores
+note right of Main
+  Cria 4 jogadores de exemplo:
+  - Ana Silva (Prof)
+  - Carlos Santos (Amador)
+  - Maria Oliveira (Prof)
+  - Joao Costa (Amador)
+end note
+
+Main -> Main: Formar equipes
+note right of Main
+  Equipe 1: Ana Silva + Carlos Santos
+  Equipe 2: Maria Oliveira + Joao Costa
+end note
+
+Main -> Torneio: new("Copa de Verao 2024", PONTOS_CORRIDOS)
+activate Torneio
+
+Main -> Torneio: adicionarParticipante("Ana Silva")
+Main -> Torneio: adicionarParticipante("Carlos Santos")
+Main -> Torneio: adicionarParticipante("Maria Oliveira")
+Main -> Torneio: adicionarParticipante("Joao Costa")
+
+Main -> Torneio: gerarRodadas()
+note right of Torneio
+  Gera todas as combinações
+  de partidas possíveis
+end note
+
+Main -> Torneio: simularPartidas()
+activate Torneio
+
+loop Para cada partida
+  Torneio -> Partida: new(participante1, participante2)
+  activate Partida
+  
+  Torneio -> Partida: simularResultado()
+  note right of Partida
+    Gera placar aleatório
+    para ambos participantes
+  end note
+  
+  Torneio -> Partida: exibir()
+  activate Partida
+  Partida --> Torneio: Mostra resultado
+  deactivate Partida
+  
+  deactivate Partida
+end
+
+deactivate Torneio
+deactivate Torneio
+
+Main -> Ranking: new()
+activate Ranking
+
+Main -> Ranking: adicionarPontuacao("Ana Silva", 9)
+Main -> Ranking: adicionarPontuacao("Carlos Santos", 4)
+Main -> Ranking: adicionarPontuacao("Maria Oliveira", 7)
+Main -> Ranking: adicionarPontuacao("Joao Costa", 3)
+
+Main -> Ranking: gerar()
+note right of Ranking
+  Ordena jogadores por
+  pontuação decrescente
+end note
+
+Main -> Ranking: exibir()
+activate Ranking
+Ranking --> Main: Mostra ranking na tela
+deactivate Ranking
+
+Main -> Ranking: exportar("ranking.csv")
+activate Ranking
+Ranking -> Persistencia: salvarDados()
+deactivate Ranking
+
+Main -> Persistencia: salvarJogadores(jogadores[], "jogadores.csv")
+activate Persistencia
+Persistencia --> Main: Dados salvos
+deactivate Persistencia
+
+deactivate Ranking
+deactivate Main
+
+Usuario <- Main: Exibe resultado final
+
+@enduml

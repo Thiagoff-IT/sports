@@ -1,0 +1,70 @@
+@startuml Fluxo de Cadastro de Jogadores
+
+participant Usuario
+participant Main
+participant Jogador
+participant Persistencia
+
+== Criar Jogadores Personalizados ==
+
+Usuario -> Main: Escolhe opção 2
+activate Main
+
+Main -> Main: Limpar tela
+Main -> Usuario: Solicita quantidade de jogadores
+Usuario -> Main: Digite quantidade (2-20)
+
+Main -> Main: Validar quantidade
+note right of Main
+  Mínimo: 2 jogadores
+  Máximo: 20 jogadores
+end note
+
+Main -> Main: Limpar jogadores existentes
+
+loop Para cada jogador
+  Usuario -> Main: Nome
+  Usuario -> Main: Idade
+  Usuario -> Main: Esporte
+  Usuario -> Main: Nível (1=Amador, 2=Profissional)
+  
+  Main -> Jogador: new(nome, idade, esporte, tipo)
+  activate Jogador
+  
+  note right of Jogador
+    Inicializa com:
+    - vitorias = 0
+    - derrotas = 0
+    - empates = 0
+  end note
+  
+  Jogador --> Main: Jogador criado
+  deactivate Jogador
+  
+  Main -> Main: Adicionar à lista de jogadores
+  Main -> Usuario: [OK] Jogador cadastrado!
+end
+
+Main -> Main: Exibir lista de jogadores cadastrados
+loop Para cada jogador
+  Main -> Main: Mostrar: Nome, Idade, Esporte
+end
+
+Main -> Persistencia: salvarJogadores(jogadores[], "jogadores.csv")
+activate Persistencia
+
+loop Para cada jogador
+  Persistencia -> Jogador: salvar(ofstream)
+  activate Jogador
+  Jogador -> Persistencia: Dados formatados
+  deactivate Jogador
+  Persistencia -> Persistencia: Escrever no arquivo CSV
+end
+
+Persistencia --> Main: Arquivo criado
+deactivate Persistencia
+
+Main -> Usuario: [SUCCESS] Jogadores salvos em 'jogadores.csv'
+deactivate Main
+
+@enduml
